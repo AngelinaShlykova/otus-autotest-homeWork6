@@ -15,10 +15,7 @@ public abstract class AbsBaseTest {
     public void init() {
         String browser = System.getProperty("browser.type", "chrome");
         String baseUrl = System.getProperty("base.url", "https://otus.home.kartushin.su");
-
         driver = WebDriverFactory.create(browser);
-        driver.manage().window().maximize();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
     }
 
     @AfterEach

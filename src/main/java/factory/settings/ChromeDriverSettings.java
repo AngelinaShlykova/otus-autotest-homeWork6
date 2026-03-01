@@ -5,9 +5,10 @@ import org.openqa.selenium.remote.AbstractDriverOptions;
 public class ChromeDriverSettings implements ISettings {
 
     @Override
-    public AbstractDriverOptions settings() {
+    public AbstractDriverOptions<?> settings() {
         ChromeOptions chromeOptions = new ChromeOptions();
 
+        chromeOptions.addArguments("--start-maximized");
         chromeOptions.addArguments("--remote-allow-origins=*");
         chromeOptions.addArguments("--disable-notifications");
         chromeOptions.addArguments("--disable-dev-shm-usage");

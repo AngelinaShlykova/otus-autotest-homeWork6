@@ -8,6 +8,9 @@ import org.openqa.selenium.support.PageFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ResultPage {
 
     private static final Logger logger = LoggerFactory.getLogger(ResultPage.class);
@@ -36,33 +39,61 @@ public class ResultPage {
 
         String outputText = getOutputText();
 
+        Map<String, String> expectedData = new HashMap<>();
+        expectedData.put("Имя пользователя", expectedUsername);
+        expectedData.put("Электронная почта", expectedEmail);
+
+        String dateDDMMYYYY = expectedBirthDate;
+        String dateYYYYMMDD = expectedBirthDate.contains(".")
+                ? expectedBirthDate.replace(".", "-")
+                : expectedBirthDate;
+        expectedData.put("Дата рождения", dateDDMMYYYY + "|" + dateYYYYMMDD);
+
+        String levelValue = mapLanguageLevel(expectedLevel);
+        expectedData.put("Уровень языка", expectedLevel + "|" + levelValue);
+
         boolean isCorrect = true;
 
-        if (!outputText.contains(expectedUsername)) {
-            isCorrect = false;
-        } else {
-        }
+        for (Map.Entry<String, String> entry : expectedData.entrySet()) {
+            String fieldName = entry.getKey();
+            String expectedValue = entry.getValue();
 
-        if (!outputText.contains(expectedEmail)) {
-            isCorrect = false;
-        } else {
-        }
+            boolean found;
+            if (expectedValue.contains("|")) {
+                String[] variants = expectedValue.split("\\|");
+                found = outputText.contains(variants[0]) ||
+                        (variants.length > 1 && outputText.contains(variants[1]));
+            } else {
+                found = outputText.contains(expectedValue);
+            }
 
-        if (!outputText.contains(expectedBirthDate) &&
-                !outputText.contains(expectedBirthDate.replace(".", "-"))) {
-            isCorrect = false;
-        } else {
-        }
-
-        if (!outputText.contains(expectedLevel) &&
-                !outputText.contains("intermediate")) {
-            isCorrect = false;
-        } else {
+            if (!found) {
+                logger.error("Поле '{}' не найдено в выводе. Ожидалось: '{}'", fieldName, expectedValue);
+                isCorrect = false;
+            } else {
+                logger.info("Поле '{}' проверено", fieldName);
+            }
         }
 
         if (isCorrect) {
+            logger.info("Данные проверены");
         }
 
         return isCorrect;
+    }
+
+    private String mapLanguageLevel(String level) {
+        switch (level.trim()) {
+            case "Начальный":
+                return "beginner";
+            case "Средний":
+                return "intermediate";
+            case "Продвинутый":
+                return "advanced";
+            case "Носитель языка":
+                return "native";
+            default:
+                return level;
+        }
     }
 }

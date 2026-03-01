@@ -43,7 +43,10 @@ public class FormPage {
     }
 
     public FormPage open() {
-        String baseUrl = System.getProperty("base.url", "https://otus.home.kartushin.su");
+        String baseUrl = System.getProperty("base.url");
+        if (baseUrl == null || baseUrl.isEmpty()) {
+            throw new IllegalStateException("свойство не задано");
+        }
         driver.get(baseUrl + "/form.html");
         return this;
     }
